@@ -1,0 +1,1924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FileForge AI — Generate Presentations & Spreadsheets with AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07070d;
+  --bg2:#0e0e18;
+  --bg3:#161624;
+  --bg4:#1e1e2e;
+  --bg5:#252538;
+  --border:#1e1e30;
+  --border2:#2e2e48;
+  --border3:#3e3e58;
+  --text:#eeeef8;
+  --text2:#8888a8;
+  --text3:#4a4a68;
+  --accent:#6c63ff;
+  --accent2:#a78bfa;
+  --accent3:#22d3ee;
+  --green:#10b981;
+  --red:#f43f5e;
+  --amber:#fbbf24;
+  --orange:#fb923c;
+  --grad:linear-gradient(135deg,#6c63ff,#a78bfa);
+  --grad2:linear-gradient(135deg,#22d3ee,#6c63ff);
+  --grad3:linear-gradient(135deg,#f43f5e,#fb923c);
+  --r:14px;
+  --r2:9px;
+  --r3:6px;
+  --shadow:0 4px 32px rgba(0,0,0,.5);
+  --shadow2:0 8px 48px rgba(108,99,255,.18);
+  --glow:0 0 40px rgba(108,99,255,.12);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:15px;line-height:1.6}
+h1,h2,h3,h4{font-family:'Syne',sans-serif;line-height:1.15}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;outline:none;transition:all .2s ease}
+input,textarea,select{font-family:'DM Sans',sans-serif;outline:none;transition:all .2s ease}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border3);border-radius:4px}
+
+/* ── LAYOUT ── */
+.app{display:flex;flex-direction:column;min-height:100vh}
+.page{display:none;flex:1;flex-direction:column}
+.page.active{display:flex}
+
+/* ── NAV ── */
+.topnav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:62px;border-bottom:1px solid var(--border);background:rgba(7,7,13,.92);backdrop-filter:blur(24px);position:sticky;top:0;z-index:200}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px;cursor:pointer}
+.logo-icon{width:30px;height:30px;border-radius:8px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-text{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;align-items:center;gap:2px}
+.nav-link{padding:7px 14px;border-radius:var(--r2);color:var(--text2);font-size:13.5px;font-weight:500;cursor:pointer;transition:all .2s}
+.nav-link:hover,.nav-link.active{color:var(--text);background:var(--bg3)}
+.nav-actions{display:flex;align-items:center;gap:10px}
+.btn-ghost{padding:7px 16px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:13.5px;font-weight:500}
+.btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+.btn-primary{padding:8px 18px;border-radius:var(--r2);background:var(--grad);color:#fff;font-size:13.5px;font-weight:600;border:none;letter-spacing:.2px}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px);box-shadow:var(--shadow2)}
+.btn-primary:active{transform:translateY(0)}
+.btn-danger{background:var(--grad3)!important}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;color:#fff;border:2px solid var(--border2)}
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.badge-green{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.2)}
+.badge-accent{background:rgba(108,99,255,.15);color:var(--accent2);border:1px solid rgba(108,99,255,.2)}
+.badge-amber{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+
+/* ══════════════════════════════════════════
+   LANDING PAGE
+══════════════════════════════════════════ */
+.landing{flex:1;overflow-y:auto}
+.hero{min-height:90vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px 60px;text-align:center;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.1}
+.orb1{width:700px;height:700px;background:radial-gradient(circle,#6c63ff,transparent 70%);top:-200px;left:-200px}
+.orb2{width:600px;height:600px;background:radial-gradient(circle,#a78bfa,transparent 70%);bottom:-150px;right:-150px}
+.orb3{width:500px;height:500px;background:radial-gradient(circle,#22d3ee,transparent 70%);top:40%;left:50%;transform:translate(-50%,-50%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;opacity:.3;mask-image:radial-gradient(ellipse at center,transparent 30%,black 80%)}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:99px;padding:5px 16px 5px 8px;font-size:13px;color:var(--text2);margin-bottom:28px;cursor:default}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse-dot 2s ease infinite}
+@keyframes pulse-dot{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{box-shadow:0 0 0 6px rgba(16,185,129,0)}}
+.hero h1{font-size:clamp(40px,6.5vw,82px);font-weight:800;letter-spacing:-2.5px;margin-bottom:22px;max-width:880px;line-height:1.05}
+.hero h1 .g1{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero h1 .g2{background:var(--grad2);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:17px;color:var(--text2);max-width:520px;margin-bottom:44px;font-weight:300;line-height:1.7}
+.hero-input-row{display:flex;width:100%;max-width:660px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);padding:5px 5px 5px 18px;margin-bottom:18px;gap:0;transition:border-color .2s}
+.hero-input-row:focus-within{border-color:var(--accent)}
+.hero-input-row input{flex:1;background:transparent;border:none;color:var(--text);font-size:15px;min-width:0}
+.hero-input-row input::placeholder{color:var(--text3)}
+.hero-cta{padding:11px 26px;border-radius:var(--r2);background:var(--grad);color:#fff;font-size:15px;font-weight:600;white-space:nowrap;border:none;cursor:pointer}
+.hero-cta:hover{opacity:.88;transform:translateY(-1px)}
+.hero-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:580px}
+.chip{padding:6px 14px;border-radius:99px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:13px;cursor:pointer;transition:all .2s}
+.chip:hover{border-color:var(--accent);color:var(--text);background:var(--bg4)}
+
+/* Features */
+.section{padding:88px 32px;max-width:1180px;margin:0 auto;width:100%}
+.sec-eyebrow{font-size:11.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.sec-title{font-size:clamp(26px,3.5vw,42px);font-weight:700;letter-spacing:-1.2px;margin-bottom:14px}
+.sec-sub{color:var(--text2);max-width:500px;font-size:16px;margin-bottom:52px;line-height:1.7}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}
+.feat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:28px;transition:all .3s;position:relative;overflow:hidden;cursor:default}
+.feat-card:hover{border-color:rgba(108,99,255,.4);transform:translateY(-3px);box-shadow:var(--glow)}
+.feat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--grad);opacity:0;transition:opacity .3s}
+.feat-card:hover::after{opacity:1}
+.feat-icon{width:46px;height:46px;border-radius:11px;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;border:1px solid var(--border2)}
+.feat-card h3{font-size:17px;font-weight:700;margin-bottom:8px;letter-spacing:-.3px}
+.feat-card p{color:var(--text2);font-size:13.5px;line-height:1.65}
+
+/* Pricing */
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:18px;max-width:860px}
+.price-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:30px;position:relative;transition:all .3s}
+.price-card.featured{border-color:rgba(108,99,255,.5);background:linear-gradient(145deg,rgba(108,99,255,.06),rgba(167,139,250,.04))}
+.price-card.featured:hover{box-shadow:var(--shadow2)}
+.price-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:10.5px;font-weight:700;padding:3px 14px;border-radius:99px;letter-spacing:.8px;text-transform:uppercase}
+.price-name{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text2);margin-bottom:4px}
+.price-amount{font-family:'Syne',sans-serif;font-size:46px;font-weight:800;letter-spacing:-2px;margin:12px 0 2px;line-height:1}
+.price-amount sup{font-size:22px;font-weight:600;vertical-align:top;margin-top:10px;display:inline-block}
+.price-amount sub{font-size:16px;font-weight:400;color:var(--text2);letter-spacing:0}
+.price-per{color:var(--text3);font-size:13px;margin-bottom:22px}
+.price-feats{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:26px}
+.price-feats li{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--text2)}
+.price-feats li::before{content:'✓';color:var(--green);font-weight:800;font-size:12px;flex-shrink:0}
+
+/* How it works */
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;position:relative}
+.steps-grid::before{content:'';position:absolute;top:28px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--border2),var(--border2),transparent);z-index:0}
+.step{text-align:center;padding:28px 24px;position:relative;z-index:1}
+.step-num{width:56px;height:56px;border-radius:50%;background:var(--bg3);border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin:0 auto 18px;color:var(--accent)}
+.step h4{font-size:15px;font-weight:700;margin-bottom:6px;letter-spacing:-.2px}
+.step p{font-size:13px;color:var(--text2);line-height:1.6}
+
+/* ══════════════════════════════════════════
+   AUTH MODAL
+══════════════════════════════════════════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(7,7,13,.88);backdrop-filter:blur(12px);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:36px;width:100%;max-width:420px;position:relative;box-shadow:var(--shadow)}
+.modal-close{position:absolute;top:18px;right:18px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;font-size:16px}
+.modal-close:hover{border-color:var(--accent);color:var(--text)}
+.modal-title{font-size:24px;font-weight:800;letter-spacing:-.7px;margin-bottom:6px}
+.modal-sub{color:var(--text2);font-size:14px;margin-bottom:28px}
+.tab-row{display:flex;background:var(--bg3);border-radius:var(--r2);padding:3px;gap:2px;margin-bottom:24px;border:1px solid var(--border)}
+.tab-btn{flex:1;padding:8px;border-radius:7px;background:transparent;border:none;color:var(--text2);font-size:13.5px;font-weight:500;cursor:pointer;transition:all .2s}
+.tab-btn.active{background:var(--bg);color:var(--text);box-shadow:0 1px 6px rgba(0,0,0,.3)}
+.auth-tab{display:none}
+.auth-tab.active{display:block}
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin-bottom:7px;display:block}
+.form-input{width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r2);padding:11px 14px;color:var(--text);font-size:14px}
+.form-input:focus{border-color:var(--accent)}
+.form-input::placeholder{color:var(--text3)}
+.form-btn{width:100%;padding:13px;border-radius:var(--r2);background:var(--grad);color:#fff;font-size:15px;font-weight:600;border:none;cursor:pointer;margin-top:4px;letter-spacing:.2px}
+.form-btn:hover{opacity:.88}
+.form-err{color:var(--red);font-size:13px;margin-top:8px;display:none}
+.form-err.show{display:block}
+.form-hint{text-align:center;color:var(--text3);font-size:13px;margin-top:16px}
+.guest-btn{width:100%;padding:12px;border-radius:var(--r2);background:transparent;border:1.5px solid var(--border2);color:var(--text2);font-size:14px;font-weight:500;cursor:pointer;margin-top:12px;transition:all .2s}
+.guest-btn:hover{border-color:var(--accent);color:var(--text)}
+
+/* ══════════════════════════════════════════
+   DASHBOARD LAYOUT
+══════════════════════════════════════════ */
+.dash-layout{display:flex;flex:1;overflow:hidden;height:calc(100vh - 62px)}
+.sidebar{width:215px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:16px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.sb-label{font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);padding:10px 12px 5px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r2);color:var(--text2);font-size:13.5px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid transparent}
+.sb-item:hover{background:var(--bg3);color:var(--text)}
+.sb-item.active{background:linear-gradient(135deg,rgba(108,99,255,.14),rgba(167,139,250,.08));color:var(--accent2);border-color:rgba(108,99,255,.18)}
+.sb-icon{font-size:17px;width:20px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:99px;line-height:1.5}
+.sb-divider{height:1px;background:var(--border);margin:8px 0}
+.dash-main{flex:1;overflow-y:auto;padding:28px 32px}
+.page-title{font-size:27px;font-weight:800;letter-spacing:-.7px;margin-bottom:5px}
+.page-sub{color:var(--text2);margin-bottom:28px;font-size:14.5px}
+
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;transition:all .2s}
+.stat-card:hover{border-color:var(--border2)}
+.stat-label{font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin-bottom:10px}
+.stat-val{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;letter-spacing:-1px;line-height:1}
+.stat-change{font-size:12px;color:var(--green);margin-top:5px;display:flex;align-items:center;gap:4px}
+.stat-change.down{color:var(--red)}
+
+/* Project cards */
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.proj-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .3s}
+.proj-card:hover{border-color:rgba(108,99,255,.4);transform:translateY(-2px);box-shadow:var(--shadow2)}
+.proj-thumb{height:130px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:34px;position:relative;overflow:hidden}
+.proj-thumb-grad{position:absolute;inset:0;opacity:.25}
+.proj-info{padding:14px}
+.proj-type{font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+.proj-name{font-weight:600;font-size:14.5px;margin-bottom:3px;letter-spacing:-.2px}
+.proj-date{font-size:11.5px;color:var(--text3)}
+.proj-actions{display:flex;gap:8px;padding:0 14px 14px;margin-top:-4px}
+.btn-sm{padding:6px 13px;border-radius:var(--r2);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-sm-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2)}
+.btn-sm-ghost:hover{border-color:var(--accent);color:var(--text)}
+.btn-sm-prim{background:var(--grad);color:#fff;border:none}
+.btn-sm-prim:hover{opacity:.88}
+.proj-new{border-style:dashed!important;display:flex;align-items:center;justify-content:center;min-height:180px}
+.proj-new .plus{text-align:center;color:var(--text3)}
+.proj-new:hover .plus{color:var(--accent)}
+.proj-new .plus-icon{font-size:28px;margin-bottom:6px}
+.proj-new .plus-label{font-size:13px}
+
+/* ══════════════════════════════════════════
+   AI GENERATOR PAGE
+══════════════════════════════════════════ */
+.gen-wrap{max-width:740px;margin:0 auto;padding:32px}
+.gen-title{font-size:30px;font-weight:800;letter-spacing:-1px;margin-bottom:6px}
+.gen-sub{color:var(--text2);margin-bottom:32px;font-size:15px}
+.prompt-box{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:18px;transition:border-color .2s}
+.prompt-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.08)}
+.prompt-box textarea{width:100%;background:transparent;border:none;color:var(--text);font-size:15.5px;resize:none;min-height:130px;line-height:1.65}
+.prompt-box textarea::placeholder{color:var(--text3)}
+.prompt-toolbar{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border);margin-top:12px}
+.char-count{font-size:12px;color:var(--text3)}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px}
+.opt-group{display:flex;flex-direction:column;gap:7px}
+.opt-label{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text2)}
+.opt-select{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r2);padding:10px 14px;color:var(--text);font-size:13.5px;appearance:none;cursor:pointer;width:100%}
+.opt-select:focus{border-color:var(--accent)}
+.seg{display:flex;background:var(--bg3);border-radius:var(--r2);padding:3px;gap:2px;border:1px solid var(--border)}
+.seg-btn{flex:1;padding:8px;border-radius:6px;background:transparent;border:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
+.seg-btn.active{background:var(--bg);color:var(--text);box-shadow:0 1px 5px rgba(0,0,0,.3)}
+.gen-btn{width:100%;padding:15px;border-radius:var(--r);background:var(--grad);color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:.2px;border:none;cursor:pointer}
+.gen-btn:hover{opacity:.88;transform:translateY(-1px);box-shadow:var(--shadow2)}
+.quick-tmpl-row{display:flex;gap:7px;flex-wrap:wrap}
+
+/* Checkpoint panel */
+.checkpoint-panel{background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--r);padding:22px;margin-top:24px;display:none}
+.checkpoint-panel.open{display:block}
+.cp-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.cp-step{width:28px;height:28px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
+.cp-title{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.cp-msg{color:var(--text2);font-size:14px;line-height:1.65;margin-bottom:18px;white-space:pre-line}
+.cp-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.cp-opt{background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r2);padding:12px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:12px}
+.cp-opt:hover{border-color:var(--accent);background:var(--bg4)}
+.cp-opt.selected{border-color:var(--accent);background:rgba(108,99,255,.08)}
+.cp-opt-key{width:28px;height:28px;border-radius:7px;background:var(--bg4);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--accent);flex-shrink:0}
+.cp-opt-label{font-weight:600;font-size:14px;margin-bottom:2px}
+.cp-opt-desc{font-size:13px;color:var(--text2);line-height:1.5}
+.cp-custom-row{display:flex;gap:8px;margin-top:10px}
+.cp-custom-input{flex:1;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r2);padding:10px 14px;color:var(--text);font-size:14px}
+.cp-custom-input:focus{border-color:var(--accent)}
+.cp-send{padding:10px 20px;border-radius:var(--r2);background:var(--grad);color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer}
+.progress-steps{display:flex;align-items:center;gap:0;margin-bottom:22px;overflow-x:auto;padding-bottom:4px}
+.ps{display:flex;align-items:center;gap:0;flex-shrink:0}
+.ps-node{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:72px}
+.ps-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text3);transition:all .3s}
+.ps-dot.done{background:var(--grad);border-color:transparent;color:#fff}
+.ps-dot.active{border-color:var(--accent);color:var(--accent);background:rgba(108,99,255,.1)}
+.ps-name{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;text-align:center}
+.ps-line{width:32px;height:2px;background:var(--border2);flex-shrink:0;margin-bottom:14px}
+.ps-line.done{background:var(--grad)}
+
+/* File download cards */
+.file-cards{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.file-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r2);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.file-card-icon{font-size:24px;flex-shrink:0}
+.file-card-info{flex:1;min-width:0}
+.file-card-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-card-meta{font-size:12px;color:var(--text3);margin-top:2px}
+.file-dl-btn{padding:8px 16px;border-radius:var(--r2);background:var(--grad);color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.file-dl-btn:hover{opacity:.88}
+
+/* Refine chat */
+.refine-section{margin-top:24px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;display:none}
+.refine-section.open{display:block}
+.refine-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.refine-indicator{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse-dot 2s ease infinite}
+.refine-msgs{padding:16px;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.rmsg{padding:11px 14px;border-radius:var(--r2);font-size:13.5px;line-height:1.6;max-width:92%}
+.rmsg.ai{background:var(--bg3);color:var(--text)}
+.rmsg.user{background:linear-gradient(135deg,rgba(108,99,255,.18),rgba(167,139,250,.15));border:1px solid rgba(108,99,255,.25);color:var(--text);align-self:flex-end}
+.refine-input-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--border)}
+.refine-input{flex:1;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r2);padding:10px 14px;color:var(--text);font-size:14px}
+.refine-input:focus{border-color:var(--accent)}
+.refine-send{padding:10px 18px;border-radius:var(--r2);background:var(--grad);color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer}
+
+/* Upload reference */
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--r);padding:28px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg2)}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(108,99,255,.04)}
+.upload-zone-icon{font-size:32px;margin-bottom:10px}
+.upload-zone-text{font-size:14px;color:var(--text2)}
+.upload-zone-hint{font-size:12px;color:var(--text3);margin-top:4px}
+
+/* ══════════════════════════════════════════
+   EDITOR PAGE
+══════════════════════════════════════════ */
+.editor-layout{display:flex;flex:1;overflow:hidden;height:calc(100vh - 62px)}
+.slides-panel{width:210px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:10px;display:flex;flex-direction:column;gap:7px;overflow-y:auto}
+.slides-panel-hdr{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:2px 6px 6px}
+.slide-thumb{border-radius:var(--r2);overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;position:relative;background:var(--bg3)}
+.slide-thumb.active{border-color:var(--accent)}
+.slide-thumb:hover:not(.active){border-color:var(--border2)}
+.slide-thumb-inner{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;padding:8px;font-size:11px;color:var(--text3)}
+.slide-num{position:absolute;bottom:4px;left:5px;font-size:8.5px;background:rgba(0,0,0,.65);color:var(--text2);padding:2px 5px;border-radius:3px}
+.editor-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.editor-toolbar{display:flex;align-items:center;gap:6px;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg2);flex-wrap:wrap}
+.tool-btn{padding:7px 12px;border-radius:var(--r2);background:transparent;border:1px solid var(--border);color:var(--text2);font-size:12.5px;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.tool-btn:hover{border-color:var(--accent);color:var(--text)}
+.tool-sep{width:1px;height:22px;background:var(--border);margin:0 3px;flex-shrink:0}
+.editor-canvas{flex:1;display:flex;align-items:center;justify-content:center;padding:36px;background:var(--bg);overflow:auto}
+.slide-preview{width:100%;max-width:740px;aspect-ratio:16/9;background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;padding:48px;position:relative;overflow:hidden}
+.slide-preview .slide-title{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;letter-spacing:-1px;margin-bottom:14px}
+.slide-preview .slide-body{color:var(--text2);font-size:14.5px;line-height:1.7}
+.slide-accent{position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad)}
+
+/* AI Chat panel */
+.ai-chat{width:290px;flex-shrink:0;border-left:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2)}
+.ai-chat-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.ai-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse-dot 2s infinite}
+.ai-msgs{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.ai-msg{padding:11px 13px;border-radius:var(--r2);font-size:13px;line-height:1.6;max-width:92%}
+.ai-msg.ai{background:var(--bg3);color:var(--text)}
+.ai-msg.user{background:linear-gradient(135deg,rgba(108,99,255,.18),rgba(167,139,250,.14));border:1px solid rgba(108,99,255,.25);color:var(--text);align-self:flex-end}
+.ai-input-row{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:7px}
+.ai-input{flex:1;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r2);padding:9px 13px;color:var(--text);font-size:13px}
+.ai-input:focus{border-color:var(--accent)}
+.ai-send{padding:9px 13px;border-radius:var(--r2);background:var(--grad);color:#fff;font-size:13px;border:none;cursor:pointer}
+
+/* ══════════════════════════════════════════
+   EXCEL GENERATOR PAGE
+══════════════════════════════════════════ */
+.excel-wrap{max-width:1080px;margin:0 auto;padding:28px 32px}
+.table-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);margin-bottom:20px}
+table.xt{width:100%;border-collapse:collapse;min-width:600px}
+table.xt th{background:var(--bg3);padding:10px 16px;text-align:left;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap}
+table.xt td{padding:10px 16px;font-size:13.5px;border-bottom:1px solid var(--border)}
+table.xt tr:last-child td{border-bottom:none}
+table.xt tr:hover td{background:var(--bg3)}
+table.xt td.editable{cursor:text}
+table.xt td.editable:focus{background:rgba(108,99,255,.08);outline:none;box-shadow:inset 0 0 0 2px rgba(108,99,255,.35)}
+.excel-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+/* ══════════════════════════════════════════
+   TEMPLATES PAGE
+══════════════════════════════════════════ */
+.templates-wrap{padding:28px 32px}
+.cat-tabs{display:flex;gap:7px;margin-bottom:26px;flex-wrap:wrap}
+.cat-tab{padding:7px 18px;border-radius:99px;background:transparent;border:1px solid var(--border);color:var(--text2);font-size:13.5px;cursor:pointer;transition:all .2s;font-weight:500}
+.cat-tab.active,.cat-tab:hover{background:var(--grad);color:#fff;border-color:transparent}
+.tmpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.tmpl-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .3s}
+.tmpl-card:hover{border-color:rgba(108,99,255,.4);transform:translateY(-3px);box-shadow:var(--shadow2)}
+.tmpl-preview{height:142px;display:flex;align-items:center;justify-content:center;font-size:30px;position:relative}
+.tmpl-info{padding:13px}
+.tmpl-name{font-weight:600;font-size:14px;margin-bottom:3px;letter-spacing:-.2px}
+.tmpl-cat{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px}
+.tmpl-hover{position:absolute;inset:0;background:rgba(7,7,13,.72);opacity:0;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:7px}
+.tmpl-card:hover .tmpl-hover{opacity:1}
+
+/* ══════════════════════════════════════════
+   ANALYTICS PAGE
+══════════════════════════════════════════ */
+.analytics-wrap{padding:28px 32px}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:22px}
+.chart-title{font-weight:700;font-size:15.5px;margin-bottom:3px;letter-spacing:-.3px}
+.chart-sub{font-size:12.5px;color:var(--text2);margin-bottom:18px}
+canvas.chart{max-height:210px}
+
+/* ══════════════════════════════════════════
+   HISTORY PAGE
+══════════════════════════════════════════ */
+.history-table{width:100%;border-collapse:collapse}
+.history-table th{background:var(--bg3);padding:11px 16px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text2);border-bottom:1px solid var(--border)}
+.history-table td{padding:12px 16px;font-size:13.5px;border-bottom:1px solid var(--border)}
+.history-table tr:hover td{background:var(--bg3)}
+.history-table td:last-child{text-align:right}
+
+/* ══════════════════════════════════════════
+   SETTINGS PAGE
+══════════════════════════════════════════ */
+.settings-wrap{max-width:680px}
+.settings-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:16px}
+.settings-section h3{font-size:15.5px;font-weight:700;letter-spacing:-.3px;margin-bottom:4px}
+.settings-section p{font-size:13px;color:var(--text2);margin-bottom:20px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.settings-row:last-child{border-bottom:none;padding-bottom:0}
+.settings-row-label{font-size:14px;font-weight:500}
+.settings-row-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.api-key-display{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:10px 14px;font-size:13px;font-family:monospace;color:var(--text2);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.toggle{width:40px;height:22px;border-radius:99px;background:var(--border2);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;border:none}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s}
+.toggle.on::after{left:21px}
+
+/* ══════════════════════════════════════════
+   LOADING OVERLAY
+══════════════════════════════════════════ */
+.loading-overlay{position:fixed;inset:0;background:rgba(7,7,13,.92);backdrop-filter:blur(14px);z-index:999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:22px}
+.loading-overlay.open{display:flex}
+.loading-ring{width:60px;height:60px;border-radius:50%;border:3px solid var(--border2);border-top-color:var(--accent);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:17px;font-weight:500;color:var(--text2)}
+.loading-dots::after{content:'';animation:dots 1.5s infinite}
+@keyframes dots{0%{content:''}33%{content:'.'}66%{content:'..'}100%{content:'...'}}
+.loading-bar-wrap{width:280px;height:3px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.loading-bar-fill{height:100%;background:var(--grad);border-radius:99px;width:0;transition:width .5s ease}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:12px 18px;font-size:13.5px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);z-index:2000;transform:translateX(160%);transition:transform .3s cubic-bezier(.34,1.56,.64,1);max-width:310px}
+.toast.show{transform:translateX(0)}
+
+/* ══════════════════════════════════════════
+   MISC
+══════════════════════════════════════════ */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:22px}
+.divider{height:1px;background:var(--border);margin:24px 0}
+.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}
+.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}.mb-24{margin-bottom:24px}
+.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}
+.text-sm{font-size:13px}.text-xs{font-size:11.5px}.text-accent{color:var(--accent)}.text-green{color:var(--green)}.text-red{color:var(--red)}.text-muted{color:var(--text2)}
+.truncate{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+@keyframes fade-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fade-in .3s ease}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ═══════════════════════════════════════════
+     GLOBAL NAV
+═══════════════════════════════════════════ -->
+<nav class="topnav" id="topnav">
+  <div class="logo" onclick="navigate('landing')">
+    <div class="logo-icon">⚡</div>
+    <span class="logo-text">FileForge AI</span>
+  </div>
+  <div class="nav-links" id="nav-links">
+    <div class="nav-link" onclick="navigate('landing')">Home</div>
+    <div class="nav-link" onclick="requireAuth('dashboard')">Dashboard</div>
+    <div class="nav-link" onclick="requireAuth('generator')">Generator</div>
+    <div class="nav-link" onclick="requireAuth('templates')">Templates</div>
+  </div>
+  <div class="nav-actions" id="nav-actions">
+    <button class="btn-ghost" onclick="openModal('login')">Log in</button>
+    <button class="btn-primary" onclick="openModal('register')">Get Started</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     AUTH MODAL
+═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modal-title">Welcome back</div>
+    <div class="modal-sub" id="modal-sub">Sign in to access your workspace</div>
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-login" onclick="switchAuthTab('login')">Log In</button>
+      <button class="tab-btn" id="tab-register" onclick="switchAuthTab('register')">Register</button>
+    </div>
+
+    <!-- Login -->
+    <div class="auth-tab active" id="auth-login">
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input class="form-input" id="login-username" type="text" placeholder="your username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="login-password" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="form-err" id="login-err"></div>
+      <button class="form-btn" onclick="doLogin()">Sign In →</button>
+      <button class="guest-btn" onclick="doGuest()">Continue as Guest (no account needed)</button>
+    </div>
+
+    <!-- Register -->
+    <div class="auth-tab" id="auth-register">
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input class="form-input" id="reg-username" type="text" placeholder="choose a username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="reg-email" type="email" placeholder="you@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="reg-password" type="password" placeholder="min 6 characters" onkeydown="if(event.key==='Enter')doRegister()">
+      </div>
+      <div class="form-err" id="reg-err"></div>
+      <button class="form-btn" onclick="doRegister()">Create Account →</button>
+    </div>
+    <div class="form-hint">By continuing, you agree to our Terms of Service</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     LOADING OVERLAY
+═══════════════════════════════════════════ -->
+<div class="loading-overlay" id="loading">
+  <div class="loading-ring"></div>
+  <div class="loading-text loading-dots" id="loading-text">Analyzing your goal</div>
+  <div class="loading-bar-wrap"><div class="loading-bar-fill" id="loading-bar"></div></div>
+  <div style="font-size:12px;color:var(--text3)" id="loading-sub">This may take 10–20 seconds</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TOAST
+═══════════════════════════════════════════ -->
+<div class="toast" id="toast"><span id="toast-icon"></span><span id="toast-msg"></span></div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 1: LANDING
+═══════════════════════════════════════════ -->
+<div class="page active" id="page-landing">
+  <div class="landing">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-bg">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+        <div class="hero-grid"></div>
+      </div>
+      <div class="hero-badge"><div class="hero-badge-dot"></div> <span>v2.0 — Now with 19 Slide Layouts & Iterative Refinement</span></div>
+      <h1>Turn <span class="g1">any idea</span> into<br>a <span class="g2">professional file</span></h1>
+      <p class="hero-sub">Describe what you need. Get a polished PPTX, Excel, or both — in seconds. Powered by AI with 10 themes, 19 layouts, and real charts.</p>
+      <div class="hero-input-row">
+        <input id="hero-input" placeholder="e.g. 10-slide pitch deck for an AI fitness startup…" onkeydown="if(event.key==='Enter')heroStart()">
+        <button class="hero-cta" onclick="heroStart()">✨ Generate</button>
+      </div>
+      <div class="hero-chips">
+        <div class="chip" onclick="setHeroChip('Investor pitch deck for a fintech startup with market size, traction, and financials')">🚀 Investor Pitch</div>
+        <div class="chip" onclick="setHeroChip('Q4 sales performance report with regional breakdown and forecasts')">📈 Sales Report</div>
+        <div class="chip" onclick="setHeroChip('Product launch presentation with feature highlights and go-to-market strategy')">💡 Product Launch</div>
+        <div class="chip" onclick="setHeroChip('Monthly revenue forecast Excel with MRR, churn, CAC, and LTV columns')">📊 Revenue Tracker</div>
+        <div class="chip" onclick="setHeroChip('Team handbook and onboarding guide with 12 slides')">🎓 Onboarding Deck</div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="section">
+      <div class="sec-eyebrow">Why FileForge</div>
+      <div class="sec-title">Everything you need to<br>create stunning files</div>
+      <div class="sec-sub">From blank page to polished presentation in under 30 seconds. No design skills needed.</div>
+      <div class="feat-grid">
+        <div class="feat-card"><div class="feat-icon">🎨</div><h3>10 Professional Themes</h3><p>Professional, Creative, Startup, Ocean, Nature, Gold, Sunset, and more. Every theme is pixel-perfect with matching fonts.</p></div>
+        <div class="feat-card"><div class="feat-icon">📐</div><h3>19 Slide Layouts</h3><p>Title hero, two-column, chart+text, timeline, stats highlight, icon grid, quote, and 12 more — all AI-selected per slide.</p></div>
+        <div class="feat-card"><div class="feat-icon">📊</div><h3>Real Charts & Data</h3><p>Matplotlib-rendered bar, line, pie, area, and scatter charts — not placeholders. Your data, beautifully visualised.</p></div>
+        <div class="feat-card"><div class="feat-icon">🖼️</div><h3>Unsplash Backgrounds</h3><p>AI picks a relevant background photo from Unsplash for image slides. Real photography, every time.</p></div>
+        <div class="feat-card"><div class="feat-icon">📋</div><h3>Rich Excel Output</h3><p>Conditional formatting, data bars, traffic lights, heat maps, frozen headers, native charts — just like a real analyst built it.</p></div>
+        <div class="feat-card"><div class="feat-icon">💬</div><h3>Iterative Refinement</h3><p>Not happy? Chat with AI to tweak anything. Change a theme, add a slide, update data — files regenerate instantly.</p></div>
+        <div class="feat-card"><div class="feat-icon">📎</div><h3>Upload Reference Files</h3><p>Drop in a sample PPTX or XLSX and FileForge will replicate the style, layout, and structure for your new content.</p></div>
+        <div class="feat-card"><div class="feat-icon">🔒</div><h3>Secure & Private</h3><p>Every session is tied to your account. API key authentication, MySQL persistence, and full generation history.</p></div>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <div class="section" style="text-align:center">
+      <div class="sec-eyebrow">How it works</div>
+      <div class="sec-title">From goal to file in 5 steps</div>
+      <div class="sec-sub" style="margin:0 auto 52px">Each step is interactive. You're always in control.</div>
+      <div class="steps-grid">
+        <div class="step"><div class="step-num">1</div><h4>Describe Your Goal</h4><p>Type what you need in plain English. No templates, no forms.</p></div>
+        <div class="step"><div class="step-num">2</div><h4>Choose Structure</h4><p>AI generates 3 outline options. Pick one or describe your own.</p></div>
+        <div class="step"><div class="step-num">3</div><h4>Select Theme & Tone</h4><p>8 visual themes × 4 tones. Pick a combination that fits your audience.</p></div>
+        <div class="step"><div class="step-num">4</div><h4>Review Content</h4><p>AI fills every slide or sheet. Approve, modify, or regenerate.</p></div>
+        <div class="step"><div class="step-num">5</div><h4>Download & Refine</h4><p>Get your file instantly. Chat to refine anything after download.</p></div>
+      </div>
+    </div>
+
+    <!-- Pricing -->
+    <div class="section">
+      <div class="sec-eyebrow">Pricing</div>
+      <div class="sec-title">Simple, transparent pricing</div>
+      <div class="sec-sub">Start free. Scale when you need to.</div>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div class="price-name">Free</div>
+          <div class="price-amount"><sup>$</sup>0<sub>/mo</sub></div>
+          <div class="price-per">Forever free</div>
+          <ul class="price-feats">
+            <li>5 files per month</li><li>All 10 themes</li><li>10 slide layouts</li><li>Basic Excel styles</li><li>Community support</li>
+          </ul>
+          <button class="btn-primary" style="width:100%" onclick="openModal('register')">Get Started Free</button>
+        </div>
+        <div class="price-card featured">
+          <div class="price-badge">MOST POPULAR</div>
+          <div class="price-name">Pro</div>
+          <div class="price-amount"><sup>$</sup>19<sub>/mo</sub></div>
+          <div class="price-per">Billed monthly</div>
+          <ul class="price-feats">
+            <li>Unlimited files</li><li>All 19 slide layouts</li><li>Unsplash backgrounds</li><li>Advanced Excel + charts</li><li>Upload reference files</li><li>Generation history</li><li>Priority support</li>
+          </ul>
+          <button class="btn-primary" style="width:100%" onclick="openModal('register')">Start Pro Trial</button>
+        </div>
+        <div class="price-card">
+          <div class="price-name">Team</div>
+          <div class="price-amount"><sup>$</sup>49<sub>/mo</sub></div>
+          <div class="price-per">Up to 5 members</div>
+          <ul class="price-feats">
+            <li>Everything in Pro</li><li>Team workspace</li><li>Shared templates</li><li>API access</li><li>Custom branding</li><li>SSO / SAML</li>
+          </ul>
+          <button class="btn-ghost" style="width:100%" onclick="openModal('register')">Contact Sales</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="border-top:1px solid var(--border);padding:32px;text-align:center;color:var(--text3);font-size:13px">
+      <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">FileForge AI</div>
+      <div>© 2025 FileForge AI — Built for Hackathon 2025 · <span style="color:var(--accent);cursor:pointer">Privacy</span> · <span style="color:var(--accent);cursor:pointer">Terms</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 2: DASHBOARD
+═══════════════════════════════════════════ -->
+<div class="page" id="page-dashboard">
+  <div class="dash-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sb-label">Workspace</div>
+      <div class="sb-item active" onclick="showDashTab('overview')" id="sb-overview"><span class="sb-icon">⊞</span> Overview</div>
+      <div class="sb-item" onclick="showDashTab('projects')" id="sb-projects"><span class="sb-icon">📁</span> Projects</div>
+      <div class="sb-item" onclick="navigate('generator')" ><span class="sb-icon">✨</span> New File</div>
+      <div class="sb-item" onclick="navigate('templates')"><span class="sb-icon">🎨</span> Templates</div>
+      <div class="sb-divider"></div>
+      <div class="sb-label">Tools</div>
+      <div class="sb-item" onclick="navigate('analytics')" id="sb-analytics"><span class="sb-icon">📈</span> Analytics</div>
+      <div class="sb-item" onclick="showDashTab('history')" id="sb-history"><span class="sb-icon">🕐</span> History</div>
+      <div class="sb-divider"></div>
+      <div class="sb-label">Account</div>
+      <div class="sb-item" onclick="showDashTab('settings')" id="sb-settings"><span class="sb-icon">⚙</span> Settings</div>
+      <div class="sb-item" onclick="doLogout()" style="margin-top:auto"><span class="sb-icon">↩</span> Log Out</div>
+    </div>
+
+    <!-- Main content -->
+    <main class="dash-main">
+      <!-- Overview -->
+      <div id="dash-overview" class="fade-in">
+        <div class="flex items-center justify-between mb-12">
+          <div>
+            <div class="page-title">Good morning, <span id="dash-username">User</span> 👋</div>
+            <div class="page-sub">Here's what's happening with your files.</div>
+          </div>
+          <button class="btn-primary" onclick="navigate('generator')">✨ New File</button>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Total Files</div><div class="stat-val" id="stat-files">0</div><div class="stat-change">↑ 3 this week</div></div>
+          <div class="stat-card"><div class="stat-label">PPTX Created</div><div class="stat-val" id="stat-pptx">0</div><div class="stat-change">↑ 2 this month</div></div>
+          <div class="stat-card"><div class="stat-label">Excel Created</div><div class="stat-val" id="stat-xlsx">0</div><div class="stat-change">↑ 1 this week</div></div>
+          <div class="stat-card"><div class="stat-label">Refinements</div><div class="stat-val">0</div><div class="stat-change" style="color:var(--text3)">AI chat sessions</div></div>
+        </div>
+
+        <!-- Upload reference -->
+        <div class="card mb-16">
+          <div class="flex items-center justify-between mb-12">
+            <div><div style="font-weight:700;font-size:15px;margin-bottom:2px">📎 Upload Reference File</div><div class="text-sm text-muted">Drop a PPTX or XLSX to replicate its style in your next generation.</div></div>
+          </div>
+          <div class="upload-zone" id="upload-zone" onclick="document.getElementById('ref-file-input').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleRefDrop(event)">
+            <div class="upload-zone-icon">📂</div>
+            <div class="upload-zone-text">Click to upload or drag & drop</div>
+            <div class="upload-zone-hint">.pptx or .xlsx files only · Max 20MB</div>
+          </div>
+          <input type="file" id="ref-file-input" accept=".pptx,.xlsx" style="display:none" onchange="handleRefUpload(this)">
+          <div id="ref-upload-result" style="display:none;margin-top:12px" class="card-sm" style="background:var(--bg3)"></div>
+        </div>
+
+        <div style="font-weight:700;font-size:16px;margin-bottom:14px">Recent Projects</div>
+        <div class="proj-grid" id="dash-proj-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Projects tab -->
+      <div id="dash-projects" style="display:none" class="fade-in">
+        <div class="flex items-center justify-between mb-16">
+          <div><div class="page-title">My Projects</div><div class="page-sub">All your AI-generated presentations and spreadsheets.</div></div>
+          <button class="btn-primary" onclick="navigate('generator')">+ New File</button>
+        </div>
+        <div class="flex gap-12 mb-16">
+          <input style="flex:1;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r2);padding:10px 16px;color:var(--text);font-size:14px" placeholder="🔍 Search projects…" oninput="filterProjects(this.value)">
+          <select class="opt-select" style="width:150px" onchange="filterProjectType(this.value)"><option>All Types</option><option>PPTX</option><option>Excel</option></select>
+        </div>
+        <div class="proj-grid" id="all-projects-grid"></div>
+      </div>
+
+      <!-- History tab -->
+      <div id="dash-history" style="display:none" class="fade-in">
+        <div class="page-title">Generation History</div>
+        <div class="page-sub">All files generated in your account.</div>
+        <div class="card" style="overflow:auto">
+          <table class="history-table" id="history-table">
+            <thead><tr><th>File</th><th>Type</th><th>Theme</th><th>Goal</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="history-tbody">
+              <tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px">Loading history…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Settings tab -->
+      <div id="dash-settings" style="display:none" class="fade-in">
+        <div class="page-title">Settings</div>
+        <div class="page-sub">Manage your account and API keys.</div>
+        <div class="settings-wrap">
+          <div class="settings-section">
+            <h3>Account</h3>
+            <p>Your account details.</p>
+            <div class="settings-row"><div><div class="settings-row-label">Username</div><div class="settings-row-sub" id="set-username">—</div></div></div>
+            <div class="settings-row"><div><div class="settings-row-label">Email</div><div class="settings-row-sub" id="set-email">—</div></div></div>
+            <div class="settings-row"><div><div class="settings-row-label" style="margin-bottom:8px">API Key</div><div class="api-key-display" id="set-apikey"><span style="opacity:.5">••••••••••••••••••••••••</span><button class="btn-sm btn-sm-ghost" onclick="revealApiKey()">Show</button></div></div></div>
+          </div>
+          <div class="settings-section">
+            <h3>Preferences</h3>
+            <p>Customise your generation experience.</p>
+            <div class="settings-row"><div><div class="settings-row-label">Default Theme</div><div class="settings-row-sub">Used when no theme is selected</div></div><select class="opt-select" style="width:160px" id="pref-theme"><option value="professional">Professional</option><option value="creative">Creative</option><option value="startup">Startup</option><option value="ocean">Ocean</option></select></div>
+            <div class="settings-row"><div><div class="settings-row-label">Default Tone</div></div><select class="opt-select" style="width:160px" id="pref-tone"><option value="professional">Professional</option><option value="conversational">Conversational</option><option value="data_driven">Data-Driven</option><option value="inspirational">Inspirational</option></select></div>
+            <div class="settings-row"><div><div class="settings-row-label">Auto-open refine chat</div><div class="settings-row-sub">After file generation</div></div><button class="toggle on" id="toggle-refine" onclick="togglePref(this)"></button></div>
+          </div>
+          <div class="settings-section">
+            <h3>Danger Zone</h3>
+            <p>Irreversible actions — proceed with caution.</p>
+            <div class="settings-row"><div><div class="settings-row-label">Delete all files</div><div class="settings-row-sub">Permanently removes all generated files</div></div><button class="btn-sm btn-danger" style="background:var(--grad3);color:#fff;border:none;padding:7px 14px;border-radius:var(--r2);cursor:pointer;font-size:12px" onclick="showToast('⚠️','This would delete all your files')">Delete All</button></div>
+            <div class="settings-row"><div><div class="settings-row-label">Log out everywhere</div></div><button class="btn-sm btn-sm-ghost" onclick="doLogout()">Log Out</button></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 3: AI GENERATOR
+═══════════════════════════════════════════ -->
+<div class="page" id="page-generator">
+  <div class="gen-wrap">
+    <div class="gen-title">AI Generator ✨</div>
+    <div class="gen-sub">Describe what you need — AI plans, designs, and builds your file.</div>
+
+    <!-- Progress steps -->
+    <div class="progress-steps" id="gen-progress">
+      <div class="ps"><div class="ps-node"><div class="ps-dot active" id="ps1">1</div><div class="ps-name">Intent</div></div><div class="ps-line" id="pl1"></div></div>
+      <div class="ps"><div class="ps-node"><div class="ps-dot" id="ps2">2</div><div class="ps-name">Structure</div></div><div class="ps-line" id="pl2"></div></div>
+      <div class="ps"><div class="ps-node"><div class="ps-dot" id="ps3">3</div><div class="ps-name">Style</div></div><div class="ps-line" id="pl3"></div></div>
+      <div class="ps"><div class="ps-node"><div class="ps-dot" id="ps4">4</div><div class="ps-name">Content</div></div><div class="ps-line" id="pl4"></div></div>
+      <div class="ps"><div class="ps-node"><div class="ps-dot" id="ps5">✓</div><div class="ps-name">File</div></div></div>
+    </div>
+
+    <!-- Goal input (initial state) -->
+    <div id="gen-initial">
+      <div class="prompt-box">
+        <textarea id="gen-prompt" placeholder="e.g. Create a 12-slide investor pitch for an AI fitness app targeting Gen Z — include market size, problem, solution, traction (500K users), team, and $5M ask." oninput="updateCharCount()"></textarea>
+        <div class="prompt-toolbar">
+          <div class="char-count" id="char-count">0 / 2000</div>
+          <button class="btn-sm btn-sm-ghost" onclick="clearPrompt()">Clear</button>
+        </div>
+      </div>
+      <div class="opts-grid">
+        <div class="opt-group">
+          <div class="opt-label">Output Type</div>
+          <div class="seg" id="seg-type">
+            <button class="seg-btn active" onclick="setSeg(this,'type','pptx')">PPTX</button>
+            <button class="seg-btn" onclick="setSeg(this,'type','xlsx')">Excel</button>
+            <button class="seg-btn" onclick="setSeg(this,'type','both')">Both</button>
+          </div>
+        </div>
+        <div class="opt-group">
+          <div class="opt-label">Tone</div>
+          <div class="seg" id="seg-tone">
+            <button class="seg-btn active" onclick="setSeg(this,'tone','professional')">Pro</button>
+            <button class="seg-btn" onclick="setSeg(this,'tone','conversational')">Casual</button>
+            <button class="seg-btn" onclick="setSeg(this,'tone','data_driven')">Data</button>
+          </div>
+        </div>
+        <div class="opt-group">
+          <div class="opt-label">Slide Count</div>
+          <select class="opt-select" id="slide-count">
+            <option value="5">5 slides</option><option value="8">8 slides</option><option value="10" selected>10 slides</option><option value="12">12 slides</option><option value="15">15 slides</option><option value="20">20 slides</option>
+          </select>
+        </div>
+      </div>
+      <div class="card mb-16" style="padding:14px 18px">
+        <div class="text-xs text-muted mb-8" style="font-weight:700;text-transform:uppercase;letter-spacing:1px">Quick Templates</div>
+        <div class="quick-tmpl-row">
+          <div class="chip" onclick="setTmpl('investor')">🚀 Investor Pitch</div>
+          <div class="chip" onclick="setTmpl('sales')">📈 Sales Deck</div>
+          <div class="chip" onclick="setTmpl('product')">💡 Product Launch</div>
+          <div class="chip" onclick="setTmpl('report')">📋 Quarterly Report</div>
+          <div class="chip" onclick="setTmpl('education')">🎓 Course Outline</div>
+          <div class="chip" onclick="setTmpl('revenue')">📊 Revenue Forecast</div>
+        </div>
+      </div>
+      <button class="gen-btn" id="gen-start-btn" onclick="startGeneration()"><span>✨</span> Generate with AI</button>
+    </div>
+
+    <!-- Checkpoint panel (appears after start) -->
+    <div class="checkpoint-panel" id="cp-panel">
+      <div class="cp-header">
+        <div class="cp-step" id="cp-step-num">1</div>
+        <div class="cp-title" id="cp-title">Detecting intent…</div>
+      </div>
+      <div class="cp-msg" id="cp-msg"></div>
+      <div class="cp-opts" id="cp-opts"></div>
+      <div class="cp-custom-row">
+        <input class="cp-custom-input" id="cp-custom" placeholder="Or type a custom choice / modification…" onkeydown="if(event.key==='Enter')sendCheckpointResponse()">
+        <button class="cp-send" onclick="sendCheckpointResponse()">Send →</button>
+      </div>
+    </div>
+
+    <!-- File download area -->
+    <div id="gen-files" style="display:none">
+      <div class="flex items-center gap-12 mb-12">
+        <div style="font-size:18px;font-weight:800;letter-spacing:-.5px">🎉 Your files are ready!</div>
+        <span class="badge badge-green">AI Generated</span>
+      </div>
+      <div class="file-cards" id="file-cards-list"></div>
+      <button class="btn-ghost" style="margin-top:14px;width:100%" onclick="resetGenerator()">← Generate Another File</button>
+    </div>
+
+    <!-- Refinement chat -->
+    <div class="refine-section" id="refine-section">
+      <div class="refine-header">
+        <div class="refine-indicator"></div>
+        <div>
+          <div style="font-weight:700;font-size:14px">Refine Your Files</div>
+          <div style="font-size:11.5px;color:var(--text3)">Chat to make changes — files regenerate automatically</div>
+        </div>
+      </div>
+      <div class="refine-msgs" id="refine-msgs">
+        <div class="rmsg ai">✅ Your files have been generated! Describe any changes and I'll update them instantly. Examples: <em>"Make the title slide darker"</em>, <em>"Add a revenue chart on slide 4"</em>, <em>"Change theme to Ocean"</em></div>
+      </div>
+      <div class="refine-input-row">
+        <input class="refine-input" id="refine-input" placeholder="Describe what to change…" onkeydown="if(event.key==='Enter')sendRefine()">
+        <button class="refine-send" onclick="sendRefine()">Apply →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 4: SLIDE EDITOR
+═══════════════════════════════════════════ -->
+<div class="page" id="page-editor" style="flex-direction:row">
+  <div class="editor-layout">
+    <div class="slides-panel" id="slides-panel">
+      <div class="slides-panel-hdr">Slides</div>
+    </div>
+    <div class="editor-main">
+      <div class="editor-toolbar">
+        <button class="tool-btn" onclick="addSlide()">＋ Add Slide</button>
+        <button class="tool-btn" onclick="deleteSlide()">🗑 Delete</button>
+        <div class="tool-sep"></div>
+        <button class="tool-btn" onclick="regenSlide()">🔄 Regenerate</button>
+        <button class="tool-btn" onclick="changeTheme()">🎨 Theme</button>
+        <div class="tool-sep"></div>
+        <button class="tool-btn" onclick="document.execCommand('bold')"><b>B</b></button>
+        <button class="tool-btn" onclick="document.execCommand('italic')"><i>I</i></button>
+        <button class="tool-btn" onclick="document.execCommand('underline')"><u>U</u></button>
+        <div class="tool-sep"></div>
+        <button class="btn-primary" style="margin-left:auto;padding:7px 16px;font-size:12.5px" onclick="showToast('✓','Exported! Check your downloads.')">📤 Export PPT</button>
+        <button class="btn-ghost" style="padding:7px 14px;font-size:12.5px" onclick="showToast('💾','Project saved!')">💾 Save</button>
+        <button class="btn-ghost" style="padding:7px 14px;font-size:12.5px" onclick="navigate('generator')">← Back</button>
+      </div>
+      <div class="editor-canvas">
+        <div class="slide-preview" id="slide-canvas">
+          <div class="slide-accent"></div>
+          <div contenteditable="true" class="slide-title" id="slide-title">Q4 Investor Pitch</div>
+          <div contenteditable="true" class="slide-body" id="slide-body">
+            <strong style="color:var(--accent)">The AI-powered finance platform</strong><br><br>
+            We're building the next generation of personal finance tools powered by AI. Our platform helps 500K+ users save more, invest smarter, and achieve financial freedom.
+          </div>
+          <div style="position:absolute;bottom:20px;right:24px;font-size:11px;color:var(--text3)" id="slide-counter">1 / 5</div>
+        </div>
+      </div>
+    </div>
+    <div class="ai-chat">
+      <div class="ai-chat-hdr">
+        <div class="ai-dot"></div>
+        <div><div style="font-weight:700;font-size:13.5px">AI Assistant</div><div style="font-size:11px;color:var(--text3)">Modify any slide with AI</div></div>
+      </div>
+      <div class="ai-msgs" id="editor-chat-msgs">
+        <div class="ai-msg ai">👋 Hi! I can rewrite content, add data, change structure, or improve clarity. What would you like to do?</div>
+        <div class="ai-msg user">Make the intro more compelling</div>
+        <div class="ai-msg ai">Done! Leading with your user milestone ("500K users") creates instant social proof. The hook now reads as a movement, not a product.</div>
+      </div>
+      <div class="ai-input-row">
+        <input class="ai-input" id="editor-chat-input" placeholder="Ask AI…" onkeydown="if(event.key==='Enter')sendEditorChat()">
+        <button class="ai-send" onclick="sendEditorChat()">→</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 5: EXCEL GENERATOR
+═══════════════════════════════════════════ -->
+<div class="page" id="page-excel">
+  <div class="excel-wrap">
+    <div class="gen-title">Excel Generator 📊</div>
+    <div class="gen-sub">Describe your spreadsheet — AI generates structured data with formatting.</div>
+    <div class="prompt-box mb-24">
+      <textarea id="excel-prompt" placeholder="e.g. Monthly revenue forecast for a SaaS startup — columns: Month, MRR, New Customers, Churned, Net MRR Growth, CAC, LTV. Include 12 months of realistic projected data." style="min-height:80px"></textarea>
+      <div class="prompt-toolbar">
+        <div class="char-count text-muted">Be specific about columns, data types, and formulas</div>
+        <button class="btn-primary" onclick="generateExcel()">✨ Generate</button>
+      </div>
+    </div>
+    <div id="excel-preview" style="display:none">
+      <div class="flex items-center gap-12 mb-16">
+        <div style="font-weight:700;font-size:16px">Preview — Revenue Forecast 2025</div>
+        <span class="badge badge-green">AI Generated</span>
+      </div>
+      <div class="table-wrap">
+        <table class="xt" id="excel-table">
+          <thead><tr><th>Month</th><th>MRR ($)</th><th>New Customers</th><th>Churned</th><th>Net MRR Growth</th><th>CAC ($)</th><th>LTV ($)</th></tr></thead>
+          <tbody id="excel-tbody"></tbody>
+        </table>
+      </div>
+      <div class="excel-actions">
+        <button class="btn-primary" id="excel-dl-btn" onclick="downloadExcelFile()">📥 Download Excel</button>
+        <button class="btn-ghost" onclick="showToast('📋','Copied to clipboard!')">📋 Copy CSV</button>
+        <button class="btn-ghost" onclick="generateExcel()">🔄 Regenerate</button>
+        <button class="btn-ghost" onclick="addExcelRow()">＋ Add Row</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 6: TEMPLATES
+═══════════════════════════════════════════ -->
+<div class="page" id="page-templates">
+  <div class="templates-wrap">
+    <div class="page-title">Templates 🎨</div>
+    <div class="page-sub">Start with a professionally designed template.</div>
+    <div class="cat-tabs" id="cat-tabs">
+      <div class="cat-tab active" onclick="filterTmpl('All',this)">All</div>
+      <div class="cat-tab" onclick="filterTmpl('Business',this)">Business</div>
+      <div class="cat-tab" onclick="filterTmpl('Startup',this)">Startup</div>
+      <div class="cat-tab" onclick="filterTmpl('Education',this)">Education</div>
+      <div class="cat-tab" onclick="filterTmpl('Marketing',this)">Marketing</div>
+      <div class="cat-tab" onclick="filterTmpl('Finance',this)">Finance</div>
+      <div class="cat-tab" onclick="filterTmpl('Excel',this)">Excel Sheets</div>
+    </div>
+    <div class="tmpl-grid" id="tmpl-grid"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 7: ANALYTICS
+═══════════════════════════════════════════ -->
+<div class="page" id="page-analytics">
+  <div class="dash-layout">
+    <div class="sidebar">
+      <div class="sb-item" onclick="navigate('dashboard')"><span class="sb-icon">←</span> Dashboard</div>
+      <div class="sb-divider"></div>
+      <div class="sb-label">Analytics</div>
+      <div class="sb-item active"><span class="sb-icon">📈</span> Overview</div>
+      <div class="sb-item"><span class="sb-icon">📊</span> File Stats</div>
+      <div class="sb-item"><span class="sb-icon">🔁</span> Refinements</div>
+    </div>
+    <div class="dash-main">
+      <div class="analytics-wrap" style="padding:0">
+        <div class="page-title">Analytics 📈</div>
+        <div class="page-sub">Track your generation activity.</div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Total Views</div><div class="stat-val">8,420</div><div class="stat-change">↑ 23%</div></div>
+          <div class="stat-card"><div class="stat-label">Avg. Engagement</div><div class="stat-val">4m 32s</div><div class="stat-change">↑ 8%</div></div>
+          <div class="stat-card"><div class="stat-label">Downloads</div><div class="stat-val">342</div><div class="stat-change">↑ 15%</div></div>
+          <div class="stat-card"><div class="stat-label">Shares</div><div class="stat-val">89</div><div class="stat-change">↑ 32%</div></div>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-card"><div class="chart-title">Generation Activity</div><div class="chart-sub">Files created over 30 days</div><canvas class="chart" id="views-chart"></canvas></div>
+          <div class="chart-card"><div class="chart-title">File Type Breakdown</div><div class="chart-sub">PPTX vs Excel vs Both</div><canvas class="chart" id="downloads-chart"></canvas></div>
+          <div class="chart-card"><div class="chart-title">Weekly Usage</div><div class="chart-sub">Sessions by day of week</div><canvas class="chart" id="engagement-chart"></canvas></div>
+          <div class="chart-card"><div class="chart-title">Top Templates Used</div><div class="chart-sub">By usage count</div><div id="top-projects" style="display:flex;flex-direction:column;gap:12px;padding-top:4px"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════
+   CONFIG & STATE
+═══════════════════════════════════════ */
+const API = 'http://localhost:8000';
+
+const state = {
+  user: null,        // {user_id, username, email, api_key}
+  sessionId: null,
+  currentCheckpoint: 0,
+  selectedType: 'pptx',
+  selectedTone: 'professional',
+  generatedFiles: [],
+  allProjects: [],
+  chartsInited: false,
+};
+
+/* ═══════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════ */
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if (el) { el.classList.add('active'); el.scrollTop = 0; }
+
+  // Update nav links
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const navMap = {landing:'Home',dashboard:'Dashboard',generator:'Generator',templates:'Templates'};
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.textContent.trim() === (navMap[page] || '')) l.classList.add('active');
+  });
+
+  if (page === 'dashboard') { loadDashboard(); showDashTab('overview'); }
+  if (page === 'templates') renderTemplates('All');
+  if (page === 'analytics') initCharts();
+  if (page === 'editor')    initSlides();
+}
+
+function requireAuth(page) {
+  if (!state.user) { openModal('login'); return; }
+  navigate(page);
+}
+
+/* ═══════════════════════════════════════
+   AUTH MODAL
+═══════════════════════════════════════ */
+function openModal(tab) {
+  document.getElementById('auth-modal').classList.add('open');
+  switchAuthTab(tab);
+}
+function closeModal() {
+  document.getElementById('auth-modal').classList.remove('open');
+}
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('auth-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('modal-title').textContent = tab === 'login' ? 'Welcome back' : 'Create your account';
+  document.getElementById('modal-sub').textContent = tab === 'login' ? 'Sign in to access your workspace' : 'Start generating AI-powered files for free';
+}
+
+async function doLogin() {
+  const u = document.getElementById('login-username').value.trim();
+  const p = document.getElementById('login-password').value;
+  const err = document.getElementById('login-err');
+  err.classList.remove('show');
+  if (!u || !p) { showErr(err, 'Please fill in all fields'); return; }
+  try {
+    const res = await apiFetch('/auth/login', 'POST', {username:u, password:p});
+    if (res.error) { showErr(err, res.error); return; }
+    setUser(res);
+    closeModal();
+    navigate('dashboard');
+    showToast('👋', `Welcome back, ${res.username}!`);
+  } catch(e) { showErr(err, 'Connection failed. Is the backend running?'); }
+}
+
+async function doRegister() {
+  const u = document.getElementById('reg-username').value.trim();
+  const e = document.getElementById('reg-email').value.trim();
+  const p = document.getElementById('reg-password').value;
+  const err = document.getElementById('reg-err');
+  err.classList.remove('show');
+  if (!u || !e || !p) { showErr(err, 'Please fill in all fields'); return; }
+  if (p.length < 6) { showErr(err, 'Password must be at least 6 characters'); return; }
+  try {
+    const res = await apiFetch('/auth/register', 'POST', {username:u, email:e, password:p});
+    if (res.error) { showErr(err, res.error); return; }
+    setUser(res);
+    closeModal();
+    navigate('dashboard');
+    showToast('🎉', `Account created! Welcome, ${res.username}`);
+  } catch(e2) { showErr(err, 'Connection failed. Is the backend running?'); }
+}
+
+function doGuest() {
+  state.user = {username:'Guest', email:'', user_id:null, api_key:null};
+  updateNavForUser();
+  closeModal();
+  navigate('generator');
+  showToast('👤', 'Continuing as guest — sessions won\'t be saved');
+}
+
+function doLogout() {
+  state.user = null;
+  state.sessionId = null;
+  updateNavForUser();
+  navigate('landing');
+  showToast('↩', 'Logged out successfully');
+}
+
+function setUser(u) {
+  state.user = u;
+  updateNavForUser();
+  document.getElementById('dash-username').textContent = u.username;
+  document.getElementById('set-username').textContent = u.username;
+  document.getElementById('set-email').textContent = u.email || '—';
+}
+
+function updateNavForUser() {
+  const actions = document.getElementById('nav-actions');
+  if (state.user && state.user.username !== 'Guest') {
+    actions.innerHTML = `
+      <button class="btn-ghost" onclick="navigate('generator')">✨ Generate</button>
+      <div class="avatar" onclick="navigate('dashboard')" title="${state.user.username}">${state.user.username.charAt(0).toUpperCase()}</div>`;
+  } else if (state.user) {
+    actions.innerHTML = `<button class="btn-ghost" onclick="doLogout()">↩ Exit Guest</button>`;
+  } else {
+    actions.innerHTML = `<button class="btn-ghost" onclick="openModal('login')">Log in</button><button class="btn-primary" onclick="openModal('register')">Get Started</button>`;
+  }
+}
+
+function showErr(el, msg) { el.textContent = msg; el.classList.add('show'); }
+function revealApiKey() {
+  const el = document.getElementById('set-apikey');
+  el.querySelector('span').textContent = state.user?.api_key || 'No key';
+}
+
+/* ═══════════════════════════════════════
+   API HELPERS
+═══════════════════════════════════════ */
+async function apiFetch(path, method='GET', body=null) {
+  const headers = {'Content-Type':'application/json'};
+  if (state.user?.api_key) headers['X-Api-Key'] = state.user.api_key;
+  const opts = {method, headers};
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const r = await fetch(API + path, opts);
+    const data = await r.json();
+    return data;
+  } catch(e) {
+    return {error: 'Network error: ' + e.message};
+  }
+}
+
+async function apiUpload(path, formData) {
+  const headers = {};
+  if (state.user?.api_key) headers['X-Api-Key'] = state.user.api_key;
+  try {
+    const r = await fetch(API + path, {method:'POST', headers, body:formData});
+    return await r.json();
+  } catch(e) { return {error: e.message}; }
+}
+
+/* ═══════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════ */
+async function loadDashboard() {
+  if (!state.user) return;
+  renderDashProjects();
+  // Load stats from history if user logged in
+  if (state.user.user_id) {
+    const hist = await apiFetch(`/history/${state.user.user_id}`);
+    if (Array.isArray(hist)) {
+      const pptxCount = hist.filter(h => h.file_type === 'pptx' || h.file_type === 'both').length;
+      const xlsxCount = hist.filter(h => h.file_type === 'xlsx' || h.file_type === 'both').length;
+      document.getElementById('stat-files').textContent = hist.length;
+      document.getElementById('stat-pptx').textContent = pptxCount;
+      document.getElementById('stat-xlsx').textContent = xlsxCount;
+      state.allProjects = hist;
+    }
+  }
+}
+
+function showDashTab(tab) {
+  ['overview','projects','history','settings'].forEach(t => {
+    const el = document.getElementById('dash-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+    const sb = document.getElementById('sb-' + t);
+    if (sb) sb.classList.toggle('active', t === tab);
+  });
+  if (tab === 'history') loadHistory();
+  if (tab === 'projects') renderAllProjects();
+}
+
+function renderDashProjects() {
+  const grid = document.getElementById('dash-proj-grid');
+  const projects = [
+    {emoji:'🚀',name:'Q4 Investor Pitch',type:'PPTX',slides:'12 slides',updated:'2h ago',grad:'linear-gradient(135deg,#6c63ff,#a78bfa)'},
+    {emoji:'📊',name:'Revenue Forecast 2025',type:'Excel',slides:'5 sheets',updated:'yesterday',grad:'linear-gradient(135deg,#22d3ee,#6c63ff)'},
+    {emoji:'🎓',name:'Product Onboarding',type:'PPTX',slides:'8 slides',updated:'3 days ago',grad:'linear-gradient(135deg,#a78bfa,#ec4899)'},
+  ];
+  grid.innerHTML = projects.map(p => `
+    <div class="proj-card fade-in" onclick="navigate('editor')">
+      <div class="proj-thumb"><span>${p.emoji}</span><div class="proj-thumb-grad" style="background:${p.grad}"></div></div>
+      <div class="proj-info">
+        <div class="proj-type">${p.type} · ${p.slides}</div>
+        <div class="proj-name">${p.name}</div>
+        <div class="proj-date">Updated ${p.updated}</div>
+      </div>
+      <div class="proj-actions">
+        <button class="btn-sm btn-sm-ghost" onclick="event.stopPropagation();showToast('📋','Link copied!')">Share</button>
+        <button class="btn-sm btn-sm-prim">Open</button>
+      </div>
+    </div>`).join('') + `
+    <div class="proj-card proj-new fade-in" onclick="navigate('generator')">
+      <div class="plus"><div class="plus-icon">＋</div><div class="plus-label">New Project</div></div>
+    </div>`;
+}
+
+function renderAllProjects() {
+  const grid = document.getElementById('all-projects-grid');
+  if (!grid) return;
+  if (state.allProjects.length === 0) {
+    grid.innerHTML = `<div style="color:var(--text3);padding:32px;grid-column:1/-1;text-align:center">No projects yet — <span style="color:var(--accent);cursor:pointer" onclick="navigate('generator')">generate your first file</span></div>`;
+    return;
+  }
+  grid.innerHTML = state.allProjects.slice(0,20).map(p => `
+    <div class="proj-card fade-in">
+      <div class="proj-thumb" style="background:linear-gradient(135deg,#161624,#1e1e2e)"><span>${p.file_type==='xlsx'?'📊':'📊'}</span></div>
+      <div class="proj-info">
+        <div class="proj-type">${(p.file_type||'').toUpperCase()}</div>
+        <div class="proj-name truncate">${p.filename||p.goal?.slice(0,40)||'Untitled'}</div>
+        <div class="proj-date">${formatDate(p.created_at)}</div>
+      </div>
+      <div class="proj-actions">
+        <button class="btn-sm btn-sm-prim" onclick="downloadFromHistory('${p.session_id}','${p.filename}')">Download</button>
+      </div>
+    </div>`).join('') + `
+    <div class="proj-card proj-new" onclick="navigate('generator')"><div class="plus"><div class="plus-icon">＋</div><div class="plus-label">New Project</div></div></div>`;
+}
+
+async function loadHistory() {
+  if (!state.user?.user_id) {
+    document.getElementById('history-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px">Log in to see your history</td></tr>';
+    return;
+  }
+  const hist = await apiFetch(`/history/${state.user.user_id}`);
+  const tbody = document.getElementById('history-tbody');
+  if (!Array.isArray(hist) || hist.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px">No generation history yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = hist.map(h => `
+    <tr>
+      <td><strong>${h.filename || '—'}</strong></td>
+      <td><span class="badge ${h.file_type==='pptx'?'badge-accent':'badge-green'}">${(h.file_type||'').toUpperCase()}</span></td>
+      <td style="color:var(--text2)">${h.theme || '—'}</td>
+      <td class="truncate" style="max-width:200px;color:var(--text2)">${(h.goal||'').slice(0,50)}…</td>
+      <td style="color:var(--text3)">${formatDate(h.created_at)}</td>
+      <td><button class="btn-sm btn-sm-prim" onclick="downloadFromHistory('${h.session_id}','${h.filename}')">Download</button></td>
+    </tr>`).join('');
+}
+
+async function downloadFromHistory(sessionId, filename) {
+  const url = `${API}/download/${sessionId}/${filename}`;
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  if (state.user?.api_key) {
+    try {
+      const r = await fetch(url, {headers:{'X-Api-Key':state.user.api_key}});
+      const blob = await r.blob();
+      a.href = URL.createObjectURL(blob);
+    } catch(e) {}
+  }
+  a.click();
+  showToast('📥', `Downloading ${filename}`);
+}
+
+function filterProjects(val) {
+  // Client-side filter
+  renderAllProjects();
+}
+function filterProjectType(val) { renderAllProjects(); }
+function formatDate(dt) {
+  if (!dt) return '—';
+  try { return new Date(dt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+  catch(e) { return String(dt).slice(0,10); }
+}
+
+/* ═══════════════════════════════════════
+   REFERENCE FILE UPLOAD
+═══════════════════════════════════════ */
+async function handleRefUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!state.sessionId) {
+    showToast('⚠️', 'Start a generation first, then upload a reference file');
+    return;
+  }
+  showToast('📂', 'Analysing reference file…');
+  const fd = new FormData();
+  fd.append('file', file);
+  const res = await apiUpload(`/upload-reference/${state.sessionId}`, fd);
+  const resultEl = document.getElementById('ref-upload-result');
+  if (res.error) {
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = `<span style="color:var(--red)">❌ ${res.error}</span>`;
+  } else {
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = `<span style="color:var(--green)">✅ ${res.message}</span>`;
+    showToast('✅', 'Reference analysed! Style will be applied.');
+  }
+  document.getElementById('upload-zone').classList.remove('drag');
+}
+
+function handleRefDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  const input = document.getElementById('ref-file-input');
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  input.files = dt.files;
+  handleRefUpload(input);
+}
+
+/* ═══════════════════════════════════════
+   AI GENERATOR
+═══════════════════════════════════════ */
+const tmplTexts = {
+  investor:'Create a compelling 12-slide investor pitch for a B2B SaaS startup. Include: problem, solution, market size ($50B TAM), business model, traction (500K users, $2M ARR), competitive analysis, team, and $5M Series A ask.',
+  sales:'Generate a 10-slide sales performance deck for Q3 2024. Include: executive summary, regional breakdown, top performers, pipeline analysis, win/loss, and Q4 targets.',
+  product:'Create a 10-slide product launch for a mobile-first analytics tool. Include: product overview, key features, pricing tiers, GTM strategy, and launch timeline.',
+  report:'Build a 15-slide quarterly business review covering OKR progress, financial highlights, departmental updates, risks, and strategic initiatives.',
+  education:'Design a 12-slide course for "AI for Business Leaders" — 6 weeks covering AI fundamentals, use cases, implementation, ethics, and ROI.',
+  revenue:'Create a 12-month revenue forecast spreadsheet for a SaaS startup with MRR, new customers, churn, CAC, LTV, and net growth columns.',
+};
+
+function setTmpl(k) {
+  const ta = document.getElementById('gen-prompt');
+  ta.value = tmplTexts[k] || '';
+  updateCharCount();
+  ta.focus();
+  if (k === 'revenue') setSeg(document.querySelector('#seg-type .seg-btn:nth-child(2)'), 'type', 'xlsx');
+}
+
+function updateCharCount() {
+  const v = document.getElementById('gen-prompt').value;
+  document.getElementById('char-count').textContent = v.length + ' / 2000';
+}
+
+function clearPrompt() {
+  document.getElementById('gen-prompt').value = '';
+  document.getElementById('char-count').textContent = '0 / 2000';
+}
+
+function setSeg(btn, group, val) {
+  btn.closest('.seg').querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (group === 'type') state.selectedType = val;
+  if (group === 'tone') state.selectedTone = val;
+}
+
+function setHeroChip(text) {
+  if (!state.user) { openModal('login'); return; }
+  navigate('generator');
+  setTimeout(() => {
+    document.getElementById('gen-prompt').value = text;
+    updateCharCount();
+  }, 100);
+}
+
+function heroStart() {
+  const v = document.getElementById('hero-input').value.trim();
+  if (!v) { showToast('⚠️', 'Enter a goal first'); return; }
+  if (!state.user) { openModal('login'); return; }
+  navigate('generator');
+  setTimeout(() => {
+    document.getElementById('gen-prompt').value = v;
+    updateCharCount();
+    startGeneration();
+  }, 100);
+}
+
+async function startGeneration() {
+  const goal = document.getElementById('gen-prompt').value.trim();
+  if (!goal) { showToast('⚠️', 'Please describe what you want to create'); return; }
+
+  showLoading('Analyzing your goal…');
+  document.getElementById('gen-initial').style.display = 'none';
+  document.getElementById('cp-panel').classList.add('open');
+  document.getElementById('gen-files').style.display = 'none';
+  document.getElementById('refine-section').classList.remove('open');
+
+  const res = await apiFetch('/start', 'POST', {goal, user_id: state.user?.user_id || null});
+  hideLoading();
+
+  if (res.error) {
+    showToast('❌', res.error || 'Could not connect to backend. Is it running on port 8000?');
+    document.getElementById('gen-initial').style.display = 'block';
+    document.getElementById('cp-panel').classList.remove('open');
+    updateProgress(1);
+    return;
+  }
+
+  state.sessionId = res.session_id;
+  state.currentCheckpoint = res.checkpoint;
+  renderCheckpoint(res);
+  updateProgress(1);
+}
+
+async function sendCheckpointResponse() {
+  const inp = document.getElementById('cp-custom');
+  const val = inp.value.trim();
+  const selected = document.querySelector('.cp-opt.selected');
+
+  // Determine choice: selected option key takes priority, else first word of typed input
+  const choice = selected ? selected.dataset.key : (val ? val.split(' ')[0] : '');
+  // Extra: anything typed after the first word, or full text if no option selected
+  const extra = selected ? val : (val.includes(' ') ? val.slice(val.indexOf(' ') + 1) : '');
+
+  if (!choice) { showToast('⚠️', 'Please select an option or type your choice'); return; }
+
+  inp.value = '';
+  document.querySelectorAll('.cp-opt').forEach(o => o.classList.remove('selected'));
+
+  showLoading('Processing your choice…');
+
+  const res = await apiFetch('/respond', 'POST', {
+    session_id: state.sessionId,
+    choice,
+    extra,
+    user_id: state.user?.user_id || null,
+  });
+  hideLoading();
+
+  if (res.error) { showToast('❌', res.error); return; }
+
+  state.currentCheckpoint = res.checkpoint;
+
+  if (res.type === 'file' || res.files) {
+    // Done!
+    handleFileResponse(res);
+  } else {
+    renderCheckpoint(res);
+    updateProgress(res.checkpoint);
+  }
+}
+
+function renderCheckpoint(res) {
+  document.getElementById('cp-step-num').textContent = res.checkpoint;
+  document.getElementById('cp-title').textContent = res.checkpoint_name || '';
+  document.getElementById('cp-msg').textContent = res.message || '';
+
+  const optsEl = document.getElementById('cp-opts');
+  optsEl.innerHTML = '';
+  (res.options || []).forEach(opt => {
+    const div = document.createElement('div');
+    div.className = 'cp-opt';
+    div.dataset.key = opt.key;
+    div.innerHTML = `
+      <div class="cp-opt-key">${opt.key}</div>
+      <div><div class="cp-opt-label">${opt.label}</div><div class="cp-opt-desc">${opt.description||''}</div></div>`;
+    div.onclick = () => {
+      document.querySelectorAll('.cp-opt').forEach(o => o.classList.remove('selected'));
+      div.classList.add('selected');
+      document.getElementById('cp-custom').value = opt.key;
+    };
+    optsEl.appendChild(div);
+  });
+}
+
+function handleFileResponse(res) {
+  state.generatedFiles = res.files || [];
+  document.getElementById('cp-panel').classList.remove('open');
+  document.getElementById('gen-files').style.display = 'block';
+  document.getElementById('refine-section').classList.add('open');
+  updateProgress(5);
+
+  const list = document.getElementById('file-cards-list');
+  list.innerHTML = state.generatedFiles.map(f => {
+    const isPptx = f.filename.endsWith('.pptx');
+    return `
+    <div class="file-card fade-in">
+      <div class="file-card-icon">${isPptx ? '📊' : '📋'}</div>
+      <div class="file-card-info">
+        <div class="file-card-name">${f.filename}</div>
+        <div class="file-card-meta">${isPptx ? 'PowerPoint Presentation' : 'Excel Spreadsheet'} · Ready to download</div>
+      </div>
+      <button class="file-dl-btn" onclick="downloadFile('${f.download_url}','${f.filename}')">📥 Download</button>
+    </div>`;
+  }).join('');
+
+  showToast('🎉', 'Files generated successfully!');
+}
+
+async function downloadFile(url, filename) {
+  showToast('📥', `Downloading ${filename}…`);
+  try {
+    const headers = {};
+    if (state.user?.api_key) headers['X-Api-Key'] = state.user.api_key;
+    const r = await fetch(API + url, {headers});
+    const blob = await r.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  } catch(e) {
+    showToast('❌', 'Download failed: ' + e.message);
+  }
+}
+
+async function sendRefine() {
+  const inp = document.getElementById('refine-input');
+  const msg = inp.value.trim();
+  if (!msg || !state.sessionId) return;
+  inp.value = '';
+
+  addRefineMsg('user', msg);
+  showLoading('Applying changes and regenerating…');
+
+  const res = await apiFetch(`/refine/${state.sessionId}`, 'POST', {
+    session_id: state.sessionId,
+    message: msg,
+  });
+  hideLoading();
+
+  if (res.error) {
+    addRefineMsg('ai', '❌ Error: ' + res.error);
+    return;
+  }
+  addRefineMsg('ai', '✅ Applied! Your files have been updated.');
+  if (res.files) {
+    state.generatedFiles = res.files;
+    handleFileResponse(res);
+  }
+}
+
+function addRefineMsg(role, text) {
+  const msgs = document.getElementById('refine-msgs');
+  const div = document.createElement('div');
+  div.className = 'rmsg ' + role;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function updateProgress(step) {
+  for (let i = 1; i <= 5; i++) {
+    const dot = document.getElementById('ps' + i);
+    const line = document.getElementById('pl' + i);
+    if (dot) {
+      dot.classList.toggle('done', i < step);
+      dot.classList.toggle('active', i === step);
+      if (i < step) dot.textContent = '✓';
+      else dot.textContent = i === 5 ? '✓' : i;
+    }
+    if (line) line.classList.toggle('done', i < step);
+  }
+}
+
+function resetGenerator() {
+  document.getElementById('gen-initial').style.display = 'block';
+  document.getElementById('cp-panel').classList.remove('open');
+  document.getElementById('gen-files').style.display = 'none';
+  document.getElementById('refine-section').classList.remove('open');
+  document.getElementById('gen-prompt').value = '';
+  document.getElementById('char-count').textContent = '0 / 2000';
+  document.getElementById('refine-msgs').innerHTML = `<div class="rmsg ai">✅ Your files have been generated! Describe any changes and I'll update them instantly.</div>`;
+  state.sessionId = null;
+  state.generatedFiles = [];
+  updateProgress(1);
+}
+
+/* ═══════════════════════════════════════
+   EDITOR
+═══════════════════════════════════════ */
+const slides = [
+  {title:'Q4 Investor Pitch',body:'<strong style="color:var(--accent)">The AI-powered finance platform</strong><br><br>We\'re building the next generation of personal finance tools. 500K+ users trust us with their financial future.'},
+  {title:'The Problem',body:'73% of people say they feel overwhelmed by their finances. Existing tools are either too simple or too complex — leaving a massive gap in the market.'},
+  {title:'Our Solution',body:'An AI that learns your spending patterns, predicts financial risks, and provides <strong style="color:var(--accent)">personalised guidance</strong> in real time. Not just data — decisions.'},
+  {title:'Market Opportunity',body:'<strong style="color:var(--accent3)">$4.5T TAM</strong> growing at 23% CAGR. We target the 180M underserved users who need more than a budgeting app.'},
+  {title:'Traction',body:'<strong style="color:var(--green)">500K users</strong> in 14 months · $2M ARR · 94% retention · NPS of 72. Growing 30% MoM with zero paid acquisition.'},
+];
+let currentSlide = 0;
+
+function initSlides() {
+  const panel = document.getElementById('slides-panel');
+  panel.innerHTML = '<div class="slides-panel-hdr">Slides</div>';
+  slides.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'slide-thumb' + (i === currentSlide ? ' active' : '');
+    div.innerHTML = `
+      <div class="slide-thumb-inner">
+        <div style="text-align:left;width:100%">
+          <div style="font-family:Syne;font-size:8.5px;font-weight:700;color:var(--text);margin-bottom:3px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${s.title}</div>
+          <div style="background:var(--accent);height:2px;width:40%;border-radius:1px;margin-bottom:3px"></div>
+          <div style="height:1.5px;background:var(--border2);width:75%;border-radius:1px;margin-bottom:2px"></div>
+          <div style="height:1.5px;background:var(--border2);width:55%;border-radius:1px"></div>
+        </div>
+      </div>
+      <div class="slide-num">${i + 1}</div>`;
+    div.onclick = () => selectSlide(i);
+    panel.appendChild(div);
+  });
+  selectSlide(currentSlide);
+}
+
+function selectSlide(i) {
+  currentSlide = i;
+  document.getElementById('slide-title').innerHTML = slides[i].title;
+  document.getElementById('slide-body').innerHTML = slides[i].body;
+  document.querySelectorAll('.slide-thumb').forEach((t, j) => t.classList.toggle('active', j === i));
+  document.getElementById('slide-counter').textContent = (i + 1) + ' / ' + slides.length;
+}
+
+function addSlide() {
+  slides.push({title:'New Slide', body:'Click to edit. Ask the AI assistant to generate content.'});
+  currentSlide = slides.length - 1;
+  initSlides();
+  showToast('✓', 'New slide added');
+}
+
+function deleteSlide() {
+  if (slides.length <= 1) { showToast('⚠️', 'Cannot delete the only slide'); return; }
+  slides.splice(currentSlide, 1);
+  currentSlide = Math.max(0, currentSlide - 1);
+  initSlides();
+  showToast('🗑', 'Slide deleted');
+}
+
+function regenSlide() {
+  const titles = ['Key Insight','Market Analysis','Value Proposition','Competitive Moat','Call to Action'];
+  const bodies = [
+    'Our AI achieves <strong style="color:var(--accent)">94% accuracy</strong> — 40% better than industry average. This creates a moat that takes competitors 3+ years to replicate.',
+    'The global market reaches <strong style="color:var(--accent3)">$4.5T by 2027</strong> at 23% CAGR. We\'re positioned to capture 2% = $90B opportunity.',
+    'We turn complex financial data into <strong style="color:var(--green)">actionable insights</strong> users understand in seconds, not hours.',
+    'Unlike static tools, our AI learns from every interaction — creating a personalisation flywheel that improves with scale and user engagement.',
+    'Join 500K users who\'ve already transformed their financial lives. <strong style="color:var(--accent)">Start your free trial today.</strong>',
+  ];
+  const r = Math.floor(Math.random() * titles.length);
+  slides[currentSlide] = {title: titles[r], body: bodies[r]};
+  selectSlide(currentSlide);
+  showToast('🔄', 'Slide regenerated with AI');
+}
+
+function changeTheme() {
+  const themes = [
+    {accent:'#6c63ff',grad:'linear-gradient(135deg,#6c63ff,#a78bfa)'},
+    {accent:'#22d3ee',grad:'linear-gradient(135deg,#22d3ee,#6c63ff)'},
+    {accent:'#10b981',grad:'linear-gradient(135deg,#10b981,#22d3ee)'},
+    {accent:'#fbbf24',grad:'linear-gradient(135deg,#fbbf24,#f43f5e)'},
+    {accent:'#ec4899',grad:'linear-gradient(135deg,#ec4899,#6c63ff)'},
+    {accent:'#fb923c',grad:'linear-gradient(135deg,#fb923c,#fbbf24)'},
+  ];
+  const t = themes[Math.floor(Math.random() * themes.length)];
+  document.documentElement.style.setProperty('--accent', t.accent);
+  document.documentElement.style.setProperty('--grad', t.grad);
+  showToast('🎨', 'Theme changed!');
+}
+
+function sendEditorChat() {
+  const inp = document.getElementById('editor-chat-input');
+  const val = inp.value.trim();
+  if (!val) return;
+  const msgs = document.getElementById('editor-chat-msgs');
+  const uMsg = document.createElement('div');
+  uMsg.className = 'ai-msg user';
+  uMsg.textContent = val;
+  msgs.appendChild(uMsg);
+  inp.value = '';
+  setTimeout(() => {
+    const replies = [
+      "I've rewritten that section with a stronger hook — leading with the impact rather than the feature.",
+      "Updated! I've added more specific data points and sharpened the call-to-action for clarity.",
+      "Done! The content now follows the Problem → Insight → Solution framework for better persuasion.",
+      "I've restructured this slide using the McKinsey 'SCQA' format for stronger executive communication.",
+      "Applied! The slide now opens with a memorable statistic to anchor the audience's attention.",
+    ];
+    const aMsg = document.createElement('div');
+    aMsg.className = 'ai-msg ai';
+    aMsg.textContent = replies[Math.floor(Math.random() * replies.length)];
+    msgs.appendChild(aMsg);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 700);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+/* ═══════════════════════════════════════
+   EXCEL GENERATOR
+═══════════════════════════════════════ */
+const excelData = [
+  ['Jan 2025',12000,145,12,890,320,2800],['Feb 2025',13440,160,14,1020,295,2950],
+  ['Mar 2025',15100,178,15,1270,280,3100],['Apr 2025',16920,195,18,1490,270,3250],
+  ['May 2025',18700,210,19,1810,265,3400],['Jun 2025',20800,225,22,2120,260,3580],
+  ['Jul 2025',22900,240,24,2350,255,3700],['Aug 2025',25400,260,25,2720,250,3850],
+  ['Sep 2025',27800,278,27,3100,248,4000],['Oct 2025',30700,295,30,3450,245,4150],
+  ['Nov 2025',33500,315,32,3930,242,4300],['Dec 2025',36900,340,35,4430,240,4500],
+];
+
+function generateExcel() {
+  const p = document.getElementById('excel-prompt').value;
+  if (!p.trim()) { showToast('⚠️','Please enter a prompt'); return; }
+  showLoading('Generating your spreadsheet…');
+  setTimeout(() => {
+    hideLoading();
+    const tbody = document.getElementById('excel-tbody');
+    tbody.innerHTML = '';
+    excelData.forEach((row, ri) => {
+      const tr = document.createElement('tr');
+      row.forEach((cell, i) => {
+        const td = document.createElement('td');
+        td.contentEditable = 'true';
+        td.className = 'editable';
+        if (i === 1 || i === 5 || i === 6) td.textContent = '$' + cell.toLocaleString();
+        else if (i === 4) td.textContent = '$' + cell.toLocaleString() + ' (' + Math.round((cell/row[1])*100) + '%)';
+        else td.textContent = typeof cell === 'number' ? cell.toLocaleString() : cell;
+        if (ri % 2 === 0) td.style.background = 'rgba(108,99,255,.04)';
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    document.getElementById('excel-preview').style.display = 'block';
+    showToast('✓','Excel sheet generated!');
+  }, 2000);
+}
+
+function addExcelRow() {
+  const tbody = document.getElementById('excel-tbody');
+  const tr = document.createElement('tr');
+  ['','0','0','0','0','0','0'].forEach(v => {
+    const td = document.createElement('td');
+    td.contentEditable = 'true';
+    td.className = 'editable';
+    td.textContent = v;
+    tr.appendChild(td);
+  });
+  tbody.appendChild(tr);
+  showToast('➕','Row added');
+}
+
+async function downloadExcelFile() {
+  // If we have a real generated file from the AI Generator, use that
+  if (state.sessionId && state.generatedFiles.length > 0) {
+    const xlsxFile = state.generatedFiles.find(f => f.filename.endsWith('.xlsx'));
+    if (xlsxFile) { downloadFile(xlsxFile.download_url, xlsxFile.filename); return; }
+  }
+  // Otherwise guide them to the real generator
+  showToast('💡', 'Use the AI Generator to create a real downloadable Excel file');
+  setTimeout(() => {
+    if (!state.user) { openModal('login'); return; }
+    navigate('generator');
+    setTimeout(() => {
+      document.getElementById('gen-prompt').value = document.getElementById('excel-prompt').value || '';
+      updateCharCount();
+      // Pre-select Excel type
+      const xlsxBtn = document.querySelector('#seg-type .seg-btn:nth-child(2)');
+      if (xlsxBtn) setSeg(xlsxBtn, 'type', 'xlsx');
+    }, 100);
+  }, 1000);
+}
+
+/* ═══════════════════════════════════════
+   TEMPLATES
+═══════════════════════════════════════ */
+const templates = [
+  {name:'Investor Pitch',cat:'Startup',emoji:'🚀',bg:'linear-gradient(135deg,#0d0d2e,#1a0a38)'},
+  {name:'Sales Performance',cat:'Business',emoji:'📈',bg:'linear-gradient(135deg,#0a2010,#0d2520)'},
+  {name:'Product Launch',cat:'Marketing',emoji:'💡',bg:'linear-gradient(135deg,#2a0a1e,#1a0a38)'},
+  {name:'Quarterly Report',cat:'Business',emoji:'📋',bg:'linear-gradient(135deg,#0a1a2e,#0d1a38)'},
+  {name:'Course Outline',cat:'Education',emoji:'🎓',bg:'linear-gradient(135deg,#1a1a0a,#2a2a0d)'},
+  {name:'Revenue Forecast',cat:'Finance',emoji:'💹',bg:'linear-gradient(135deg,#0a2a0a,#0d2a1a)'},
+  {name:'Team Handbook',cat:'Business',emoji:'👥',bg:'linear-gradient(135deg,#1a0a0a,#2a0d0d)'},
+  {name:'Brand Deck',cat:'Marketing',emoji:'✨',bg:'linear-gradient(135deg,#1a0a30,#2a0038)'},
+  {name:'Executive Summary',cat:'Business',emoji:'📄',bg:'linear-gradient(135deg,#0d0d0d,#1a1a1a)'},
+  {name:'Data Dashboard',cat:'Finance',emoji:'📊',bg:'linear-gradient(135deg,#0a1a2e,#0a2a2e)'},
+  {name:'Competitor Analysis',cat:'Startup',emoji:'🔍',bg:'linear-gradient(135deg,#2a1a0a,#3a1a0d)'},
+  {name:'Employee Survey',cat:'Business',emoji:'📝',bg:'linear-gradient(135deg,#0a0a2a,#0d0d3a)'},
+  {name:'Budget Tracker',cat:'Finance',emoji:'💰',bg:'linear-gradient(135deg,#0a2a0a,#1a3a0d)'},
+  {name:'Project Timeline',cat:'Business',emoji:'📅',bg:'linear-gradient(135deg,#0a1a3a,#0d2040)'},
+  {name:'Lesson Plan',cat:'Education',emoji:'📚',bg:'linear-gradient(135deg,#2a2a0a,#3a300d)'},
+  {name:'KPI Dashboard',cat:'Finance',emoji:'📉',bg:'linear-gradient(135deg,#1a0a2a,#200d3a)'},
+  {name:'Go-To-Market',cat:'Startup',emoji:'🎯',bg:'linear-gradient(135deg,#2a0a0a,#3a0d10)'},
+  {name:'Onboarding Guide',cat:'Education',emoji:'🤝',bg:'linear-gradient(135deg,#0a2a1a,#0d3a20)'},
+  {name:'Marketing Strategy',cat:'Marketing',emoji:'📣',bg:'linear-gradient(135deg,#2a0a2a,#3a0d38)'},
+  {name:'Sales Forecast',cat:'Finance',emoji:'📊',bg:'linear-gradient(135deg,#0a2a1e,#0d3a28)'},
+];
+
+function renderTemplates(cat) {
+  const filtered = cat === 'All' ? templates : templates.filter(t => t.cat === cat);
+  document.getElementById('tmpl-grid').innerHTML = filtered.map(t => `
+    <div class="tmpl-card" onclick="useTmpl('${t.name}')">
+      <div class="tmpl-preview" style="background:${t.bg}">
+        <span>${t.emoji}</span>
+        <div class="tmpl-hover">
+          <button class="btn-sm btn-sm-prim" style="font-size:11px">Use Template</button>
+          <button class="btn-sm btn-sm-ghost" style="font-size:11px" onclick="event.stopPropagation();showToast('👁','Preview coming soon')">Preview</button>
+        </div>
+      </div>
+      <div class="tmpl-info">
+        <div class="tmpl-name">${t.name}</div>
+        <div class="tmpl-cat">${t.cat}</div>
+      </div>
+    </div>`).join('');
+}
+
+function filterTmpl(cat, el) {
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderTemplates(cat);
+}
+
+function useTmpl(name) {
+  if (!state.user) { openModal('login'); return; }
+  navigate('generator');
+  setTimeout(() => {
+    document.getElementById('gen-prompt').value = `Create a professional ${name} presentation with 10 slides. Follow standard ${name} best practices with compelling visuals and data.`;
+    updateCharCount();
+  }, 100);
+}
+
+/* ═══════════════════════════════════════
+   ANALYTICS CHARTS
+═══════════════════════════════════════ */
+function initCharts() {
+  if (state.chartsInited) return;
+  state.chartsInited = true;
+  setTimeout(() => {
+    const baseOpts = {
+      color:'rgba(238,238,248,.8)',
+      plugins:{legend:{labels:{color:'rgba(136,136,168,.85)',font:{family:'DM Sans',size:11.5},boxWidth:11,padding:10}}},
+      scales:{
+        x:{grid:{color:'rgba(30,30,48,.9)'},ticks:{color:'rgba(136,136,168,.85)',font:{family:'DM Sans',size:10.5}}},
+        y:{grid:{color:'rgba(30,30,48,.9)'},ticks:{color:'rgba(136,136,168,.85)',font:{family:'DM Sans',size:10.5}}}
+      }
+    };
+    const labels30 = Array.from({length:30},(_,i)=>(i+1)+'');
+
+    new Chart(document.getElementById('views-chart').getContext('2d'),{
+      type:'line',
+      data:{labels:labels30,datasets:[{label:'Files Generated',data:Array.from({length:30},(_,i)=>Math.floor(1+Math.sin(i/4)*2+Math.random()*3+i*.15)),borderColor:'#6c63ff',backgroundColor:'rgba(108,99,255,.08)',fill:true,tension:.5,pointRadius:0,borderWidth:2}]},
+      options:{...baseOpts,plugins:{legend:{display:false}}}
+    });
+
+    new Chart(document.getElementById('downloads-chart').getContext('2d'),{
+      type:'doughnut',
+      data:{labels:['PPTX','Excel','Both'],datasets:[{data:[58,28,14],backgroundColor:['#6c63ff','#22d3ee','#10b981'],borderWidth:0,hoverOffset:5}]},
+      options:{...baseOpts,cutout:'66%',scales:{},plugins:{legend:{position:'right',labels:{color:'rgba(136,136,168,.85)',font:{family:'DM Sans',size:11.5},boxWidth:10,padding:10}}}}
+    });
+
+    new Chart(document.getElementById('engagement-chart').getContext('2d'),{
+      type:'bar',
+      data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[
+        {label:'PPTX',data:[4,3,5,4,6,2,2],backgroundColor:'rgba(108,99,255,.75)',borderRadius:5},
+        {label:'Excel',data:[2,2,3,3,4,1,1],backgroundColor:'rgba(34,211,238,.75)',borderRadius:5}
+      ]},
+      options:baseOpts
+    });
+
+    const tops=[{name:'Investor Pitch',pct:100},{name:'Sales Deck',pct:72},{name:'Product Launch',pct:58},{name:'Revenue Forecast',pct:41},{name:'Team Handbook',pct:24}];
+    document.getElementById('top-projects').innerHTML=tops.map(t=>`
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px">
+          <span>${t.name}</span><span style="color:var(--text2)">${t.pct}%</span>
+        </div>
+        <div style="background:var(--bg3);border-radius:99px;height:3px;overflow:hidden">
+          <div style="width:${t.pct}%;height:100%;background:var(--grad);border-radius:99px;transition:width .8s ease"></div>
+        </div>
+      </div>`).join('');
+  }, 100);
+}
+
+/* ═══════════════════════════════════════
+   LOADING & TOAST
+═══════════════════════════════════════ */
+let loadingBar = null;
+function showLoading(text='Processing…', sub='This may take 10–20 seconds') {
+  document.getElementById('loading-text').textContent = text;
+  document.getElementById('loading-sub').textContent = sub;
+  document.getElementById('loading').classList.add('open');
+  const bar = document.getElementById('loading-bar');
+  bar.style.width = '0';
+  clearInterval(loadingBar);
+  let pct = 0;
+  loadingBar = setInterval(() => {
+    pct = Math.min(pct + Math.random() * 8, 88);
+    bar.style.width = pct + '%';
+  }, 400);
+}
+function hideLoading() {
+  clearInterval(loadingBar);
+  document.getElementById('loading-bar').style.width = '100%';
+  setTimeout(() => {
+    document.getElementById('loading').classList.remove('open');
+    document.getElementById('loading-bar').style.width = '0';
+  }, 300);
+}
+
+let toastTimer;
+function showToast(icon, msg) {
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-msg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+/* ═══════════════════════════════════════
+   SETTINGS TOGGLES
+═══════════════════════════════════════ */
+function togglePref(el) { el.classList.toggle('on'); }
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+navigate('landing');
+</script>
+</body>
+</html>
